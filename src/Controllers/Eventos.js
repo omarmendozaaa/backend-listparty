@@ -3,15 +3,15 @@ const User = require('../Models/User')
 const router = express.Router()
 const Evento = require('./../Models/Evento')
 
-router.get('/', (request, response) => {
-  Evento.find({}).then(eventos => {
+router.get('/', async (request, response) => {
+  await Evento.find({}).then(eventos => {
     response.json(eventos)
   })
 })
 
-router.get('/:id', (request, response, next) => {
+router.get('/:id', async (request, response, next) => {
   const { id } = request.params
-  Evento.findById(id).then(evento => {
+  await Evento.findById(id).then(evento => {
     evento ? response.json(evento) : response.status(404).end()
   }).catch(err => next(err))
 })
@@ -28,14 +28,14 @@ router.post('/', async (request, response) => {
     fecha: body.fecha
   })
 
-  NewEvento.save().then(SavedEvento => {
+  await NewEvento.save().then(SavedEvento => {
     user.eventos = user.eventos.concat({ eventoid: SavedEvento._id, rol: 'Host' })
     user.save()
     response.json(SavedEvento)
   })
 })
 
-router.put('/:id', (request, response, next) => {
+router.put('/:id', async (request, response, next) => {
   const body = request.body
   const { id } = request.params
 
@@ -45,7 +45,7 @@ router.put('/:id', (request, response, next) => {
     fecha: body.fecha
   }
 
-  Evento.findByIdAndUpdate(id, UpdateEvento, { new: true }).then(updatedEvento => {
+  await Evento.findByIdAndUpdate(id, UpdateEvento, { new: true }).then(updatedEvento => {
     updatedEvento ? response.json(updatedEvento) : response.status(404).end()
   }).catch(err => next(err))
 })
