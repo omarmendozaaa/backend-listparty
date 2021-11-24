@@ -14,12 +14,18 @@ app.use(express.json())
 app.use('/api/invitados', invitadosRoutes)
 app.use('/api/eventos', eventosRoutes)
 app.use('/api/users', userRoutes)
+
 app.use((request, response) => {
   response.status(404).json({
     error: 'Not found'
   })
 })
 
-const PORT = process.env.PORT
+app.use((error, request, response, next) => {
+  console.log(error.name)
+  response.status(400).end()
+})
+
+const PORT = 3001
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
