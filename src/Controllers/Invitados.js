@@ -1,4 +1,5 @@
 const express = require('express')
+const Evento = require('../Models/Evento')
 const router = express.Router()
 const Invitado = require('./../Models/Invitado')
 
@@ -17,11 +18,13 @@ router.get('/:id', (request, response, next) => {
   })
 })
 
-router.post('/', (request, response) => {
+router.post('/', async (request, response) => {
   const body = request.body
 
+  const evento = await Evento.findById(body.eventoid)
+
   const NewInvitado = new Invitado({
-    // idevento: body.idevento,
+    eventoid: evento._id,
     nombre: body.nombre,
     apellido: body.apellido,
     asistencia: false,
@@ -51,7 +54,7 @@ router.put('/:id', (request, response, next) => {
 
 router.delete('/:id', (request, response, next) => {
   const { id } = request.params
-  Invitado.findByIdAndDelete(id).then(result => {
+  Invitado.findByIdAndDelete(id).then(() => {
     response.status(204).end()
   }).catch(err => next(err))
 })

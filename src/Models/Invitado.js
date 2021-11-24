@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose')
 
 const invitadoSchema = new Schema({
-  idevento: Schema.Types.ObjectId,
+  eventoid: { type: Schema.Types.ObjectId, ref: 'Evento' },
   nombre: String,
   apellido: String,
   asistencia: Boolean,

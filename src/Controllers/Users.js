@@ -3,6 +3,11 @@ const express = require('express')
 const router = express.Router()
 const User = require('./../Models/User')
 
+router.get('/', async (request, response) => {
+  const users = await User.find({})
+  response.json(users)
+})
+
 router.post('/', async (request, response) => {
   const { body } = request
   const { username, password } = body
