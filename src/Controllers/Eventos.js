@@ -1,83 +1,65 @@
 const express = require('express')
+const User = require('../Models/User')
 const router = express.Router()
-const Evento = require('./../Models/Invitado')
-
-let eventos = [
-  {
-    id: 1,
-    anfitrion: 'omarmendoza',
-    nombre: 'Cumpleaños Jhamileth',
-    lugar: 'Casa de Chavez',
-    fecha: '2011-10-05T14:48:00.000Z',
-    organizadores: ['maryanemendozaa', 'jhamilethsalazar'],
-    seguridad: ['mariobarrena']
-  },
-  {
-    id: 2,
-    anfitrion: 'maryanemendozaa',
-    nombre: 'Organika Festival',
-    lugar: 'Jr tuputamadre',
-    fecha: '2011-10-05T14:48:00.000Z',
-    organizadores: ['omarmendoza', 'jhamilethsalazar', 'mariobarrena'],
-    seguridad: ['alexanderarboleda']
-  },
-  {
-    id: 3,
-    anfitrion: 'omarmendoza',
-    nombre: 'Cumpleaños Claudaia',
-    lugar: 'Jr. 3 Esquinas 516',
-    fecha: '2011-10-05T14:48:00.000Z',
-    organizadores: ['maryanemendozaa', 'jhoelchavez'],
-    seguridad: ['mariobarrena']
-  }
-]
-
-const generateId = () => {
-  const maxId = eventos.length > 0 ? Math.max(...eventos.map((n) => n.id)) : 0
-  return maxId + 1
-}
+const Evento = require('./../Models/Evento')
 
 router.get('/', (request, response) => {
-  response.json(eventos)
+  Evento.find({}).then(eventos => {
+    response.json(eventos)
+  })
 })
 
-router.get('/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const evento = eventos.find((evento) => evento.id === id)
-  evento ? response.json(evento) : response.status(404).end()
+router.get('/:id', (request, response, next) => {
+  const { id } = request.params
+  Evento.findById(id).then(evento => {
+    evento ? response.json(evento) : response.status(404).end()
+  }).catch(err => next(err))
 })
 
-router.post('/', (request, response) => {
+router.post('/', async (request, response) => {
   const body = request.body
 
-  const evento = {
-    id: generateId(),
-    host: body.host,
+  const user = await User.findById(body.userid)
+
+  const NewEvento = new Evento({
+    userid: user._id,
+    nombre: body.nombre,
+    lugar: body.lugar,
+    fecha: body.fecha
+  })
+
+  NewEvento.save().then(SavedEvento => {
+    user.eventos = user.eventos.concat({ eventoid: SavedEvento._id, rol: 'Host' })
+    user.save()
+    response.json(SavedEvento)
+  })
+})
+
+router.put('/:id', (request, response, next) => {
+  const body = request.body
+  const { id } = request.params
+
+  const UpdateEvento = {
     nombre: body.nombre,
     lugar: body.lugar,
     fecha: body.fecha
   }
 
-  eventos = eventos.concat(evento)
-  response.json(evento)
+  Evento.findByIdAndUpdate(id, UpdateEvento, { new: true }).then(updatedEvento => {
+    updatedEvento ? response.json(updatedEvento) : response.status(404).end()
+  }).catch(err => next(err))
 })
 
-router.put('/:id', (request, response) => {
-  const body = request.body
-  const id = Number(request.params.id)
-  const evento = eventos.find((evento) => evento.id === id)
-
-  evento.nombre = body.nombre
-  evento.lugar = body.lugar
-  evento.fecha = body.fecha
-
-  evento ? response.json(evento) : response.status(404).end()
-})
-
-router.delete('/:id', (request, response) => {
-  const id = Number(request.params.id)
-  eventos = eventos.filter((evento) => evento.id !== id)
-  response.status(204).end()
+router.delete('/:id', async (request, response, next) => {
+  const { id } = request.params
+  Evento.findByIdAndDelete(id).then(async (DeletedEvento) => {
+    const user = await User.findById(DeletedEvento.userid)
+    user.eventos = user.eventos.filter((evento) => {
+      return evento.eventoid.toString() !== DeletedEvento.id
+    })
+    await user.save()
+    response.status(204).end()
+  }).catch(err => next(err))
 })
 
 module.exports = router

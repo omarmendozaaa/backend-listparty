@@ -1,9 +1,20 @@
 const { Schema, model } = require('mongoose')
 
+const eventoRolSchema = new Schema({
+  eventoid: { type: Schema.Types.ObjectId, ref: 'Evento' },
+  rol: String // Host, Organizer, Security
+})
+
 const userSchema = new Schema({
   username: String,
   passwordHash: String,
-  eventos: [{ type: Schema.Types.ObjectId, ref: 'Evento', Rol: String }] // Host, Organizer, Security
+  eventos: [eventoRolSchema]
+})
+
+eventoRolSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    delete returnedObject._id
+  }
 })
 
 userSchema.set('toJSON', {

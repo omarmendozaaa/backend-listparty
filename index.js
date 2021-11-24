@@ -5,6 +5,8 @@ const invitadosRoutes = require('./src/Controllers/Invitados')
 const eventosRoutes = require('./src/Controllers/Eventos')
 const userRoutes = require('./src/Controllers/Users')
 const cors = require('cors')
+const NotFound = require('./middleware/NotFound')
+const BadRequest = require('./middleware/BadRequest')
 
 const app = express()
 
@@ -14,12 +16,11 @@ app.use(express.json())
 app.use('/api/invitados', invitadosRoutes)
 app.use('/api/eventos', eventosRoutes)
 app.use('/api/users', userRoutes)
-app.use((request, response) => {
-  response.status(404).json({
-    error: 'Not found'
-  })
-})
 
-const PORT = process.env.PORT
+app.use(NotFound)
+
+app.use(BadRequest)
+
+const PORT = 3001
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
