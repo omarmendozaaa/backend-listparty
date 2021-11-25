@@ -17,19 +17,20 @@ router.get('/:id', async (request, response, next) => {
 })
 
 router.post('/', async (request, response) => {
+  // sacar userid de request
   const body = request.body
 
-  const user = await User.findById(body.userid)
+  const user = await User.findById(request.userId)
 
   const NewEvento = new Evento({
-    userid: user._id,
+    userid: request.userId,
     nombre: body.nombre,
     lugar: body.lugar,
     fecha: body.fecha
   })
 
   await NewEvento.save().then(SavedEvento => {
-    user.eventos = user.eventos.concat({ eventoid: SavedEvento._id, rol: 'Host' })
+    user.eventos = user.eventos.concat({ evento: SavedEvento._id, rol: 'Host' })
     user.save()
     response.json(SavedEvento)
   })
@@ -55,7 +56,7 @@ router.delete('/:id', async (request, response, next) => {
   Evento.findByIdAndDelete(id).then(async (DeletedEvento) => {
     const user = await User.findById(DeletedEvento.userid)
     user.eventos = user.eventos.filter((evento) => {
-      return evento.eventoid.toString() !== DeletedEvento.id
+      return evento.evento._id.toString() !== DeletedEvento.id
     })
     await user.save()
     response.status(204).end()
