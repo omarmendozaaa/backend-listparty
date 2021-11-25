@@ -11,7 +11,7 @@ router.post('/', async (request, response) => {
   const user = await User.findOne({ username }).populate({
     path: 'eventos',
     populate: {
-      path: 'eventoid'
+      path: 'evento'
     }
   })
   const passwordCorrect = user === null
@@ -26,7 +26,7 @@ router.post('/', async (request, response) => {
     const userForToken = {
       id: user._id
     }
-    const token = jwt.sign(userForToken, 'labaticueva')
+    const token = jwt.sign(userForToken, process.env.JSON_SECRET)
 
     response.send({
       username: user.username,

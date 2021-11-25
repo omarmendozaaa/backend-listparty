@@ -1,3 +1,4 @@
+require('dotenv').config()
 require('./mongo') // Conecta a la base de datos
 
 const express = require('express')

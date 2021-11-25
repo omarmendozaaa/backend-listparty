@@ -7,7 +7,7 @@ router.get('/', async (request, response) => {
   const users = await User.find({}).populate({
     path: 'eventos',
     populate: {
-      path: 'eventoid'
+      path: 'evento'
     }
   })
   response.json(users)

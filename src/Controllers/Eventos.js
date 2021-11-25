@@ -30,7 +30,7 @@ router.post('/', async (request, response) => {
   })
 
   await NewEvento.save().then(SavedEvento => {
-    user.eventos = user.eventos.concat({ eventoid: SavedEvento._id, rol: 'Host' })
+    user.eventos = user.eventos.concat({ evento: SavedEvento._id, rol: 'Host' })
     user.save()
     response.json(SavedEvento)
   })

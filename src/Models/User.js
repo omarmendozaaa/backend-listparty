@@ -5,7 +5,7 @@ const userSchema = new Schema({
   nombre: String,
   apellido: String,
   passwordHash: String,
-  eventos: [{ eventoid: { type: Schema.Types.ObjectId, ref: 'Evento' }, rol: String, _id: false }]
+  eventos: [{ evento: { type: Schema.Types.ObjectId, ref: 'Evento' }, rol: String, _id: false }]
 })
 
 userSchema.set('toJSON', {

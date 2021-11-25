@@ -7,7 +7,7 @@ module.exports = (request, response, next) => {
     token = authorization.substring(7)
   }
 
-  const decodedToken = jwt.verify(token, 'labaticueva')
+  const decodedToken = jwt.verify(token, process.env.JSON_SECRET)
   if (!token || !decodedToken.id) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
