@@ -17,7 +17,12 @@ router.get('/:id', async (request, response, next) => {
     next(err)
   })
 })
-
+router.get('/evento/:idevento', async (request, response, next) => {
+  const { idevento } = request.params
+  await Invitado.find({ eventoid: idevento }).then(invitados => {
+    response.json(invitados)
+  })
+})
 router.post('/', async (request, response) => {
   const body = request.body
 
