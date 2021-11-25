@@ -17,12 +17,13 @@ router.get('/:id', async (request, response, next) => {
 })
 
 router.post('/', async (request, response) => {
+  // sacar userid de request
   const body = request.body
 
-  const user = await User.findById(body.userid)
+  const user = await User.findById(request.userId)
 
   const NewEvento = new Evento({
-    userid: user._id,
+    userid: request.userId,
     nombre: body.nombre,
     lugar: body.lugar,
     fecha: body.fecha

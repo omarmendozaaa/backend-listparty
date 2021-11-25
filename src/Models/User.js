@@ -1,20 +1,11 @@
 const { Schema, model } = require('mongoose')
 
-const eventoRolSchema = new Schema({
-  eventoid: { type: Schema.Types.ObjectId, ref: 'Evento' },
-  rol: String // Host, Organizer, Security
-})
-
 const userSchema = new Schema({
-  username: String,
+  username: { type: String, unique: true },
+  nombre: String,
+  apellido: String,
   passwordHash: String,
-  eventos: [eventoRolSchema]
-})
-
-eventoRolSchema.set('toJSON', {
-  transform: (document, returnedObject) => {
-    delete returnedObject._id
-  }
+  eventos: [{ eventoid: { type: Schema.Types.ObjectId, ref: 'Evento' }, rol: String, _id: false }]
 })
 
 userSchema.set('toJSON', {
