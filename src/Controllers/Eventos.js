@@ -56,7 +56,7 @@ router.delete('/:id', async (request, response, next) => {
   Evento.findByIdAndDelete(id).then(async (DeletedEvento) => {
     const user = await User.findById(DeletedEvento.userid)
     user.eventos = user.eventos.filter((evento) => {
-      return evento.eventoid.toString() !== DeletedEvento.id
+      return evento.evento._id.toString() !== DeletedEvento.id
     })
     await user.save()
     response.status(204).end()
